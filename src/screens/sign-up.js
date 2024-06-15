@@ -173,15 +173,41 @@ const SignUpScreen = () => {
     }
   };
 
-  const handleGameSearch = (text, setFavoriteGame) => {
-    const filtered = games.filter((game) =>
-      game.name.toLowerCase().includes(text.toLowerCase())
-    );
-    setFilteredGames(filtered);
-    if (filtered.length > 0) {
-      setFavoriteGame(filtered[0].name);
+const binarySearch = (arr, target) => {
+  let left = 0;
+  let right = arr.length - 1;
+
+  while (left <= right) {
+    let mid = Math.floor((left + right) / 2);
+
+    // Сравниваем игнорируя регистр
+    if (arr[mid].name.toLowerCase().includes(target)) {
+      return mid; // Нашли элемент
+    } else if (arr[mid].name.toLowerCase() < target) {
+      left = mid + 1; // Ищем в правой половине
+    } else {
+      right = mid - 1; // Ищем в левой половине
     }
-  };
+  }
+
+  return -1; // Элемент не найден
+};
+
+const handleGameSearch = (text, setFilteredGames, setFavoriteGame) => {
+  const searchText = text.toLowerCase();
+  const sortedGames = [...games].sort((a, b) => a.name.localeCompare(b.name));
+
+  const index = binarySearch(sortedGames, searchText);
+
+  if (index !== -1) {
+    const foundGame = sortedGames[index];
+    setFilteredGames([foundGame]);
+    setFavoriteGame(foundGame.name);
+  } else {
+    setFilteredGames([]);
+    setFavoriteGame("");
+  }
+};
 
   useEffect(() => {
     (async () => {
